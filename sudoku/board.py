@@ -14,7 +14,7 @@ class SudoLine(object):
             self.__dim = 3
         self.value_set = set(self.full_values_set[:self.__dim*self.__dim])
         self.__current_set = set(list(self.value_set))
-        self.__line = [None for i in range(self.__dim)]
+        self.__line = [None for i in range(self.__dim* self.__dim)]
         self.overwrite = overwrite
           
     @property
@@ -51,7 +51,7 @@ class SudoLine(object):
         """
         if symbol not in self.__current_set:
             return 0
-        if self.__line[position-1] not None:
+        if self.__line[position-1] is not None:
             return 1
         return 2
 
@@ -82,14 +82,77 @@ class SudoLine(object):
             self.__current_set.remove(symbol)
             return (False, state, "Символ заменен")
         
+    def delete(self, position):
+        """
+        Удаление символа из указанной позиции        
+        Arguments:
+            position {[integer]} -- [Номер позиции символа. Нумерация с единицы!]
         
+        Returns:
+            [bool] -- [True - удаление было совершено; False - ничего удалено не было]
+        """
+        if position > len(self.values) or position < 1:
+            return False
+        if self.values[position-1] is not None:
+            self.__current_set.add(self.values[position-1])    
+            self.values[position-1] = None
+            return True
+        return False
 
+    def to_str(self, wide = False):
+        """
+        преобразует значения в строку для вывода поля игры в консоль        
+        Keyword Arguments:
+            wide {bool} -- [Делает поле шире в случае True] (default: {False})
+        
+        Returns:
+            {string} -- [Строка для печати поля]
+        """
+        if wide:
+            sep = " | "
+        else:
+            sep = "|"
+        out = sep
+        for i in self.values:
+            if i is None:
+                out += " "
+            else:
+                out += i
+            out += sep
+        return out
 
     def __str__(self):
         """
         Вывод функции print()
         """
         return ("Размерность: "+ str(self.__dim) + "\n" + "Набор символов: " + str(self.value_set) + "\n")
+
+class Board(object):
+
+    h_head = list("abcdefghijklmnopqrstuvwxyz")
+    v_head = [i+1 for i in range(25)]
+    sep_line = "+-"
+
+    def __init__(self, dimention = 3, overwrite = True):
+        self.__dim = dimention
+        if dimention < 2 or dimention > 5:
+            self.__dim = 3
+        self.overwrite = overwrite
+        self.main_lines = [SudoLine(dimention , overwrite)]*(self.__dim*self.__dim)
+        self.v_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
+        self.sq_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
+
+    def index_from_mark(h, v):
+        out = [0,0]
+        if type(h) == type(1):
+            out[0] = h
+        elif type(h) == type("str"):
+            try:
+                out[0] = int(h)
+        if type(v) == type("str"):
+            for i,l 
+
+
 
 
 if __name__ == "__main__":

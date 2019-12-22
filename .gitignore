@@ -1,0 +1,6 @@
+# Ignore files and paths
+
+.vscode/*
+sudoku/__pycache__/*
+
+testgame.py
