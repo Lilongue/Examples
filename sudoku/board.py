@@ -80,7 +80,7 @@ class SudoLine(object):
             self.__current_set.add(self.values[position-1])
             self.values[position-1] = symbol
             self.__current_set.remove(symbol)
-            return (False, state, "Символ заменен")
+            return (True, state, "Символ заменен")
         
     def delete(self, position):
         """
@@ -126,6 +126,7 @@ class SudoLine(object):
         Вывод функции print()
         """
         return ("Размерность: "+ str(self.__dim) + "\n" + "Набор символов: " + str(self.value_set) + "\n")
+       
 
 class Board(object):
 
@@ -142,22 +143,49 @@ class Board(object):
         self.v_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
         self.sq_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
 
-    def index_from_mark(h, v):
+    @staticmethod
+    def index_from_mark(row_head, col_head):
         out = [0,0]
-        if type(h) == type(1):
-            out[0] = h
-        elif type(h) == type("str"):
+        if isinstance(row_head) == isinstance(1):
+            out[0] = row_head
+        elif isinstance(row_head) == isinstance("str"):
             try:
-                out[0] = int(h)
-        if type(v) == type("str"):
-            for i,l 
-
-
+                out[0] = int(row_head)
+            except:
+                pass
+        if isinstance(col_head) == isinstance("str"):
+            for i,l in enumerate(Board.h_head):
+                if l == col_head:
+                    out[1] = i
+        if isinstance(col_head) == isinstance(1):
+            out[1] = col_head
+        return tuple(out)
+        
+    def index_to_sq(self, row_number, col_number):
+        
+        out = False
+        sq_numb = int(row_number/self.__dim) * self.__dim + (1 + col_number/self.__dim)
+        sq_pos = self.__dim * ((row_number - 1)%self.__dim) + ((col_number - 1)%self.__dim) + 1
+        out = [sq_numb, sq_pos]
+        return  out
+    
+    
+    def set_line(self, line_number, line:list):
+        
+        out = True
+        for i, s in enumerate(line):
+            if s == "":
+                self.main_lines[line_number-1].delete(i)
+            else:
+                ins = self.main_lines[line_number-1].insert(s,i)
+                if not ins[0]:
+                    out = False
+        return out
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    #import doctest
+    #doctest.testmod()
     s3 = SudoLine(3)
     s2 = SudoLine(2)
     s4 = SudoLine(4)
@@ -170,3 +198,4 @@ if __name__ == "__main__":
     print(s5)
     print(s6)
     print(s0)
+    
