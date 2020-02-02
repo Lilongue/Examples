@@ -129,10 +129,12 @@ class SudoLine(object):
        
 
 class Board(object):
-
+    """Класс описывает и отображает игровое поле
+    """
     h_head = list("abcdefghijklmnopqrstuvwxyz")
     v_head = [i+1 for i in range(25)]
     sep_line = "+-"
+    sep_line_w = "+---"
 
     def __init__(self, dimention = 3, overwrite = True):
         self.__dim = dimention
@@ -144,7 +146,16 @@ class Board(object):
         self.sq_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
 
     @staticmethod
-    def index_from_mark(row_head, col_head):
+    def index_from_mark(col_head, row_head):
+        """Преобразует значение метки в координаты доски
+        
+        Arguments:
+            row_head {integer or string} -- метка столбца доски
+            col_head {integer or string} -- метка строки доски
+        
+        Returns:
+            tuple of integers -- Кортеж в виде (номер строки, номер столбца)
+        """
         out = [0,0]
         if isinstance(row_head) == isinstance(1):
             out[0] = row_head
@@ -162,16 +173,32 @@ class Board(object):
         return tuple(out)
         
     def index_to_sq(self, row_number, col_number):
+        """Переводит индекс поля в номер квадрата и индекс внутри него
         
+        Arguments:
+            row_number {integer} -- Номер строки, начиная с единицы
+            col_number {integer} -- Номер столбца, начиная с единицы
+        
+        Returns:
+            tuple of integers or bool -- Кортеж вида (номер квадрата, позиция в квардате) или False при неудачном преобразовании
+        """
         out = False
         sq_numb = int(row_number/self.__dim) * self.__dim + (1 + col_number/self.__dim)
         sq_pos = self.__dim * ((row_number - 1)%self.__dim) + ((col_number - 1)%self.__dim) + 1
-        out = [sq_numb, sq_pos]
+        out = (sq_numb, sq_pos)
         return  out
     
     
     def set_line(self, line_number, line:list):
+        """Записывает линию в поле
         
+        Arguments:
+            line_number {integer} -- Номер записываемой строки 
+            line {list} -- записываемая строка в виде списка
+        
+        Returns:
+            bool -- Индикатор удачной записи
+        """
         out = True
         for i, s in enumerate(line):
             if s == "":
@@ -181,6 +208,41 @@ class Board(object):
                 if not ins[0]:
                     out = False
         return out
+
+    def print_board(self):
+        """Возвращает строку для печати игрового поля
+        
+        Returns:
+            string -- строка с игровым полем для вывода в консоль
+        """
+        out = ""
+        head = "      "
+        sep_line = "    " + Board.sep_line_w * (self.__dim * self.__dim) + "\r\n"
+        for i,s in enumerate(Board.h_head):
+            if i >= self.__dim*self.__dim:
+                break
+            head += s
+            head += "   "
+        out += head + "\r\n"
+        out += sep_line
+        for i,line in enumerate(self.main_lines):
+            temp_line =  str(Board.v_head[i]) + " "*(1 + int(i<10)) + line.to_str(wide=True) + "\r\n"
+            out += temp_line
+            out += sep_line
+        return out
+
+    def can_insert(self, symbol, position):
+
+        try:
+            row_number, col_number = Board.index_from_mark(position[0],position[1])
+        except:
+            return (False, -1, "Ошибка при интерпредации позиции")
+        out = True
+        if self.main_lines[row_number].can_insert(symbol,col_number) >= (1 + int(self.overwrite)):
+            out = False
+        if 
+
+
 
 
 if __name__ == "__main__":
