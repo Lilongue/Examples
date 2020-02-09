@@ -16,7 +16,7 @@ class SudoLine(object):
         self.__current_set = set(list(self.value_set))
         self.__line = [None for i in range(self.__dim* self.__dim)]
         self.overwrite = overwrite
-          
+
     @property
     def dim(self):
         """
@@ -40,11 +40,11 @@ class SudoLine(object):
 
     def can_insert(self, symbol, position):
         """Проверяет на возможность вставки символа в указанную позицию
-        
+
         Arguments:
             symbol {String} -- [Вставляемый символ]
             position {Integer} -- [Позиция для вставки. Нумерация с единицы!]
-        
+
         Returns:
             [Integer] -- [0 - символ не относится к числу допустимых; 1 - символ допустим, но позиция занята;
             2 - символ допустим и позиция для вставки свободна]
@@ -81,6 +81,7 @@ class SudoLine(object):
             self.values[position-1] = symbol
             self.__current_set.remove(symbol)
             return (True, state, "Символ заменен")
+        return (False, -1, "Что-то пошло не там при обработке")
         
     def delete(self, position):
         """
@@ -126,7 +127,6 @@ class SudoLine(object):
         Вывод функции print()
         """
         return ("Размерность: "+ str(self.__dim) + "\n" + "Набор символов: " + str(self.value_set) + "\n")
-       
 
 class Board(object):
     """Класс описывает и отображает игровое поле
@@ -154,7 +154,7 @@ class Board(object):
             col_head {integer or string} -- метка строки доски
         
         Returns:
-            tuple of integers -- Кортеж в виде (номер строки, номер столбца)
+            tuple of integers -- Кортеж в виде (номер строки, номер столбца) номера с нуля
         """
         out = [0,0]
         if isinstance(row_head) == isinstance(1):
@@ -232,15 +232,35 @@ class Board(object):
         return out
 
     def can_insert(self, symbol, position):
-
+        """Проверяет можно ли вставить символ в указанную позицию
+        
+        Arguments:
+            symbol {String} -- Символ передаваемый в виде строки
+            position {String} -- Позиция передаваемая в виде одной строки, например "a1" или "11"
+        
+        Returns:
+            tuple(bool, int, String) -- Кортеж вида (bool - возможна ли замена
+            int - код операции: -1 если произошла ошибка, 1 - замена возможна, 0 - замена не возможна
+            String - Описание происходящего на человеческом русском)
+        """
         try:
             row_number, col_number = Board.index_from_mark(position[0],position[1])
         except:
-            return (False, -1, "Ошибка при интерпредации позиции")
+            return (False, -1, "Ошибка при интерпретации позиции")
         out = True
-        if self.main_lines[row_number].can_insert(symbol,col_number) >= (1 + int(self.overwrite)):
+        if self.main_lines[row_number].can_insert(symbol,col_number + 1) >= (1 + int(self.overwrite)):
             out = False
-        if 
+        if self.v_lines[col_number].can_insert(symbol, row_number + 1) >= (1 + int(self.overwrite)):
+            out = False
+        try:
+            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
+        except:
+            return (False, -1, "Ошибка интерпретации позиции")
+        if self.sq_lines[sq_numb].can_insert(symbol, sq_pos + 1) >= (1 + int(self.overwrite)):
+            out = False
+        if out:
+            return (out, int(out), "Добавление возможно")
+        return (out, int(out), "Добавление не возможно")
 
 
 
