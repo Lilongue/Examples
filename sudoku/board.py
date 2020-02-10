@@ -81,7 +81,7 @@ class SudoLine(object):
             self.values[position-1] = symbol
             self.__current_set.remove(symbol)
             return (True, state, "Символ заменен")
-        return (False, -1, "Что-то пошло не там при обработке")
+        return (False, -1, "Что-то пошло не так при обработке")
         
     def delete(self, position):
         """
@@ -261,6 +261,52 @@ class Board(object):
         if out:
             return (out, int(out), "Добавление возможно")
         return (out, int(out), "Добавление не возможно")
+
+    def insert(self, symbol, position):
+        """Вставляет символ symbol в позицию position
+        
+        Arguments:
+            symbol {String} -- Символ передаваемый в виде строки
+            position {String} -- Позиция передаваемая в виде одной строки, например "a1" или "11"
+        
+        Returns:
+            tuple(bool, int, String) -- Кортеж вида (bool - выполнена ли замена
+            int - код операции: -1 если произошла ошибка, 1 - замена возможна, 0 - замена не возможна
+            String - Описание происходящего на человеческом русском)
+        """
+        can_insert = self.can_insert(symbol, position)
+        if not can_insert[0]:
+            return can_insert
+        try:
+            row_number, col_number = Board.index_from_mark(position[0],position[1])
+            insert_main = self.main_lines[row_number].insert(symbol, col_number + 1)
+            insert_vert = self.v_lines[col_number].insert(symbol, row_number + 1)
+            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
+            insert_sq = self.sq_lines[sq_numb].insert(symbol, sq_pos + 1)
+        except:
+            return (False, -1, "Что-то непредвиденное случилось при добавлении в поле символа")
+        return (insert_main[2], insert_vert[2], insert_sq[2])
+
+    def delete(self, position):
+        """Очищает указанную позицию
+        
+        Arguments:
+            position {String} -- Позиция передаваемая в виде одной строки, например "a1" или "11"
+        
+        Returns:
+            bool -- True - удаление произведено; False - удаление не произведено; None - ошибка
+        """
+        out = True
+        try:
+            row_number, col_number = Board.index_from_mark(position[0],position[1])
+            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
+            out = out and self.main_lines[row_number].delete(col_number + 1)
+            out = out and self.v_lines[col_number].delete(row_number + 1)
+            out = out and self.sq_lines[sq_numb].delete(sq_pos + 1)
+        except:
+            return None
+        return out
+
 
 
 
