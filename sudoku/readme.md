@@ -8,10 +8,10 @@
 
 ### What now?
 1. Class of sudoku line is done
-2. Class of sudoku board at work
+2. Class of sudoku board is done but have broblems with positions
 
 ### What to do?
-* insert method
-* delete method
+* test file with UnitTest classes for board
+* broblem solving in board class
 * Game class
 * Solve class
