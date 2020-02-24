@@ -1,6 +1,7 @@
 """
 Классы для отображения и хранения информации о игровом поле
 """
+import os
 
 class SudoLine(object):
     """
@@ -61,11 +62,15 @@ class SudoLine(object):
         Метод вставляет символ в указанную позицию, если это допустимо
         
         Arguments:
-            symbol {[string]} -- [символ для вставки]
-            position {[int]} -- [позиция для вставки (номерация с единицы)]
+            symbol [string] -- [символ для вставки]
+            position [int] -- [позиция для вставки (номерация с единицы)]
         
         Returns:
-            [type] -- [description]
+            [(bool, int, string)] -- Кортеж (
+                bool - Произведена ли вставка
+                int - 0 - символ не допустим; 1 - позиция была занята; 
+                    2 - позиция была пуста; -1 - непредвиденная ошибка
+                string - описание результата на человеческом русском)
         """
         state = self.can_insert(symbol,position)
         if not state:
@@ -141,7 +146,7 @@ class Board(object):
         if dimention < 2 or dimention > 5:
             self.__dim = 3
         self.overwrite = overwrite
-        self.main_lines = [SudoLine(dimention , overwrite)]*(self.__dim*self.__dim)
+        self.main_lines = [SudoLine(self.__dim, overwrite) for i in range(self.__dim * self.__dim)]
         self.v_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
         self.sq_lines = [SudoLine(self.__dim, self.overwrite) for i in range(self.__dim*self.__dim)]
 
@@ -157,18 +162,18 @@ class Board(object):
             tuple of integers -- Кортеж в виде (номер строки, номер столбца) номера с нуля
         """
         out = [0,0]
-        if isinstance(row_head) == isinstance(1):
+        if isinstance(row_head, int):
             out[0] = row_head
-        elif isinstance(row_head) == isinstance("str"):
+        elif isinstance(row_head, str):
             try:
                 out[0] = int(row_head)
             except:
                 pass
-        if isinstance(col_head) == isinstance("str"):
+        if isinstance(col_head, str):
             for i,l in enumerate(Board.h_head):
                 if l == col_head:
-                    out[1] = i
-        if isinstance(col_head) == isinstance(1):
+                    out[1] = i+1
+        if isinstance(col_head, int):
             out[1] = col_head
         return tuple(out)
         
@@ -183,7 +188,7 @@ class Board(object):
             tuple of integers or bool -- Кортеж вида (номер квадрата, позиция в квардате) или False при неудачном преобразовании
         """
         out = False
-        sq_numb = int(row_number/self.__dim) * self.__dim + (1 + col_number/self.__dim)
+        sq_numb = ((row_number-1)//self.__dim) * self.__dim + (1 + (col_number-1)//self.__dim)
         sq_pos = self.__dim * ((row_number - 1)%self.__dim) + ((col_number - 1)%self.__dim) + 1
         out = (sq_numb, sq_pos)
         return  out
@@ -217,18 +222,19 @@ class Board(object):
         """
         out = ""
         head = "      "
-        sep_line = "    " + Board.sep_line_w * (self.__dim * self.__dim) + "\r\n"
+        sep_line = "    " + Board.sep_line_w * (self.__dim * self.__dim) + os.sep
         for i,s in enumerate(Board.h_head):
             if i >= self.__dim*self.__dim:
                 break
             head += s
             head += "   "
-        out += head + "\r\n"
+        out += head + os.sep
         out += sep_line
         for i,line in enumerate(self.main_lines):
-            temp_line =  str(Board.v_head[i]) + " "*(1 + int(i<10)) + line.to_str(wide=True) + "\r\n"
+            temp_line =  str(Board.v_head[i]) + " "*(1 + int(i<10)) + line.to_str(wide=True) + os.sep
             out += temp_line
             out += sep_line
+            out += os.sep
         return out
 
     def can_insert(self, symbol, position):
@@ -248,15 +254,15 @@ class Board(object):
         except:
             return (False, -1, "Ошибка при интерпретации позиции")
         out = True
-        if self.main_lines[row_number].can_insert(symbol,col_number + 1) >= (1 + int(self.overwrite)):
+        if self.main_lines[row_number].can_insert(symbol,col_number + 1) < (1 + int(self.overwrite)):
             out = False
-        if self.v_lines[col_number].can_insert(symbol, row_number + 1) >= (1 + int(self.overwrite)):
+        if self.v_lines[col_number].can_insert(symbol, row_number + 1) < (1 + int(self.overwrite)):
             out = False
         try:
             sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
         except:
             return (False, -1, "Ошибка интерпретации позиции")
-        if self.sq_lines[sq_numb].can_insert(symbol, sq_pos + 1) >= (1 + int(self.overwrite)):
+        if self.sq_lines[sq_numb-1].can_insert(symbol, sq_pos) < (1 + int(self.overwrite)):
             out = False
         if out:
             return (out, int(out), "Добавление возможно")
@@ -282,7 +288,7 @@ class Board(object):
             insert_main = self.main_lines[row_number].insert(symbol, col_number + 1)
             insert_vert = self.v_lines[col_number].insert(symbol, row_number + 1)
             sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
-            insert_sq = self.sq_lines[sq_numb].insert(symbol, sq_pos + 1)
+            insert_sq = self.sq_lines[sq_numb-1].insert(symbol, sq_pos)
         except:
             return (False, -1, "Что-то непредвиденное случилось при добавлении в поле символа")
         return (insert_main[2], insert_vert[2], insert_sq[2])
