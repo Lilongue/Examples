@@ -8,10 +8,11 @@
 
 ### What now?
 1. Class of sudoku line is done
-2. Class of sudoku board is done but have broblems with positions
+2. Class of sudoku board is done
+3. Unittest file at work
 
 ### What to do?
 * test file with UnitTest classes for board
-* broblem solving in board class
+* Add fast board filling methods
 * Game class
 * Solve class
