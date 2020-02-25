@@ -185,12 +185,14 @@ class Board(object):
             col_number {integer} -- Номер столбца, начиная с единицы
         
         Returns:
-            tuple of integers or bool -- Кортеж вида (номер квадрата, позиция в квардате) или False при неудачном преобразовании
+            tuple of integers or bool -- Кортеж вида (номер квадрата, позиция в квардате) начиная с единицы
+            False при неудачном преобразовании
         """
-        out = False
         sq_numb = ((row_number-1)//self.__dim) * self.__dim + (1 + (col_number-1)//self.__dim)
         sq_pos = self.__dim * ((row_number - 1)%self.__dim) + ((col_number - 1)%self.__dim) + 1
         out = (sq_numb, sq_pos)
+        if out[0] > (self.__dim * self.__dim) or out[1] > (self.__dim * self.__dim):
+            return False
         return  out
     
     
@@ -222,19 +224,19 @@ class Board(object):
         """
         out = ""
         head = "      "
-        sep_line = "    " + Board.sep_line_w * (self.__dim * self.__dim) + os.sep
+        sep_line = "    " + Board.sep_line_w * (self.__dim * self.__dim) + "\n"
         for i,s in enumerate(Board.h_head):
             if i >= self.__dim*self.__dim:
                 break
             head += s
             head += "   "
-        out += head + os.sep
+        out += head + "\n"
         out += sep_line
         for i,line in enumerate(self.main_lines):
-            temp_line =  str(Board.v_head[i]) + " "*(1 + int(i<10)) + line.to_str(wide=True) + os.sep
+            temp_line =  str(Board.v_head[i]) + " " * (1 + int(i<10)) + line.to_str(wide=True) + "\n"
             out += temp_line
             out += sep_line
-            out += os.sep
+            out += "\n"
         return out
 
     def can_insert(self, symbol, position):
@@ -254,12 +256,12 @@ class Board(object):
         except:
             return (False, -1, "Ошибка при интерпретации позиции")
         out = True
-        if self.main_lines[row_number].can_insert(symbol,col_number + 1) < (1 + int(self.overwrite)):
+        if self.main_lines[row_number-1].can_insert(symbol,col_number) < (1 + int(self.overwrite)):
             out = False
-        if self.v_lines[col_number].can_insert(symbol, row_number + 1) < (1 + int(self.overwrite)):
+        if self.v_lines[col_number - 1].can_insert(symbol, row_number) < (1 + int(self.overwrite)):
             out = False
         try:
-            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
+            sq_numb, sq_pos = self.index_to_sq(row_number,col_number)
         except:
             return (False, -1, "Ошибка интерпретации позиции")
         if self.sq_lines[sq_numb-1].can_insert(symbol, sq_pos) < (1 + int(self.overwrite)):
@@ -285,9 +287,9 @@ class Board(object):
             return can_insert
         try:
             row_number, col_number = Board.index_from_mark(position[0],position[1])
-            insert_main = self.main_lines[row_number].insert(symbol, col_number + 1)
-            insert_vert = self.v_lines[col_number].insert(symbol, row_number + 1)
-            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
+            insert_main = self.main_lines[row_number-1].insert(symbol, col_number)
+            insert_vert = self.v_lines[col_number - 1].insert(symbol, row_number)
+            sq_numb, sq_pos = self.index_to_sq(row_number,col_number)
             insert_sq = self.sq_lines[sq_numb-1].insert(symbol, sq_pos)
         except:
             return (False, -1, "Что-то непредвиденное случилось при добавлении в поле символа")
@@ -305,10 +307,10 @@ class Board(object):
         out = True
         try:
             row_number, col_number = Board.index_from_mark(position[0],position[1])
-            sq_numb, sq_pos = self.index_to_sq(row_number+1,col_number+1)
-            out = out and self.main_lines[row_number].delete(col_number + 1)
-            out = out and self.v_lines[col_number].delete(row_number + 1)
-            out = out and self.sq_lines[sq_numb].delete(sq_pos + 1)
+            sq_numb, sq_pos = self.index_to_sq(row_number,col_number)
+            out = out and self.main_lines[row_number-1].delete(col_number)
+            out = out and self.v_lines[col_number-1].delete(row_number)
+            out = out and self.sq_lines[sq_numb-1].delete(sq_pos)
         except:
             return None
         return out
@@ -332,4 +334,5 @@ if __name__ == "__main__":
     print(s5)
     print(s6)
     print(s0)
+
     

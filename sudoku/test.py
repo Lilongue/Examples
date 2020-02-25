@@ -86,6 +86,23 @@ class BoardTests(unittest.TestCase):
         self.assertEqual(board.Board.index_from_mark("a", 1), (1,1), "Передача строки и числа")
         self.assertEqual(board.Board.index_from_mark(1, "1"), (1,1), "Передача числа и строки")
 
+    def test_index_to_sq(self):
+        """Проверка перевода номеров строки и столбца в номер и позицию квадрата
+        """
+        self.assertEqual(self.tboard.index_to_sq(1,1), (1,1), "Верхний левый угол")
+        self.assertEqual(self.tboard.index_to_sq(1,9), (3,3), "Верхний правый угол")
+        self.assertEqual(self.tboard.index_to_sq(9,1), (7,7), "Нижний левый угол")
+        self.assertEqual(self.tboard.index_to_sq(9,9), (9,9), "Нижний правый уго")
+        self.assertEqual(self.tboard.index_to_sq(4,5), (5,2), "Вторая клетка из центрального квадрата")
+        self.assertEqual(self.tboard.index_to_sq(10,10), False, "Перевод несуществующей позиции")
+
+    def test_set_line(self):
+        """Проверка записи линии
+        функция находится в разработке
+        """
+        pass
+
+
 
 if __name__ == "__main__":
     unittest.main()
