@@ -207,15 +207,22 @@ class Board(object):
         
         Returns:
             bool -- Индикатор удачной записи
+            int -- в случае удачной записи транслирует вывод метода insert
         """
         out = True
-        for i, s in enumerate(line):
-            if s == "":
-                self.main_lines[line_number-1].delete(i)
-            else:
-                ins = self.main_lines[line_number-1].insert(s,i)
-                if not ins[0]:
+        for i,s in enumerate(line):
+            if s != "":
+                cinp = self.can_insert(s, self.h_head[i] + str(line_number))
+                if not cinp[0]:
                     out = False
+        if not out:
+            return out
+        for i, s in enumerate(line):
+            if s == "" or s == " ":
+                self.delete(self.h_head[i] + str(line_number))
+            else:
+                ins = self.insert(s, self.h_head[i] + str(line_number))
+                out = ins[1]
         return out
 
     def print_board(self):
@@ -318,6 +325,17 @@ class Board(object):
         except:
             return None
         return out
+
+    def check_win(self):
+        """Проверяет поле на заполненность
+        
+        Returns:
+            bool -- True в случае заполненности поля, False - если есть незаполненные ячейки
+        """
+        for s_line in self.main_lines:
+            if not len(s_line.value_set):
+                return False
+        return True
 
 
 
