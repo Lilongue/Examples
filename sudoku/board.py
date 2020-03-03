@@ -1,7 +1,7 @@
+#pylint:disable=C0103
 """
 Классы для отображения и хранения информации о игровом поле
 """
-import os
 
 class SudoLine(object):
     """
@@ -35,7 +35,7 @@ class SudoLine(object):
     @property
     def current_set(self):
         """
-        Возвращает текущие допустимые значения символов для вставки (неотгаданные символы) Type = set
+        Возвращает текущие допустимые символы для вставки (неотгаданные символы) Type = set
         """
         return self.__current_set
 
@@ -47,7 +47,8 @@ class SudoLine(object):
             position {Integer} -- [Позиция для вставки. Нумерация с единицы!]
 
         Returns:
-            [Integer] -- [0 - символ не относится к числу допустимых; 1 - символ допустим, но позиция занята;
+            [Integer] -- [0 - символ не относится к числу допустимых;
+            1 - символ допустим, но позиция занята;
             2 - символ допустим и позиция для вставки свободна]
         """
         if symbol not in self.__current_set:
@@ -68,7 +69,7 @@ class SudoLine(object):
         Returns:
             [(bool, int, string)] -- Кортеж (
                 bool - Произведена ли вставка
-                int - 0 - символ не допустим; 1 - позиция была занята; 
+                int - 0 - символ не допустим; 1 - позиция была занята;
                     2 - позиция была пуста; -1 - непредвиденная ошибка
                 string - описание результата на человеческом русском)
         """
@@ -90,7 +91,7 @@ class SudoLine(object):
         
     def delete(self, position):
         """
-        Удаление символа из указанной позиции        
+        Удаление символа из указанной позиции
         Arguments:
             position {[integer]} -- [Номер позиции символа. Нумерация с единицы!]
         
@@ -100,14 +101,14 @@ class SudoLine(object):
         if position > len(self.values) or position < 1:
             return False
         if self.values[position-1] is not None:
-            self.__current_set.add(self.values[position-1])    
+            self.__current_set.add(self.values[position-1])
             self.values[position-1] = None
             return True
         return False
 
     def to_str(self, wide = False):
         """
-        преобразует значения в строку для вывода поля игры в консоль        
+        преобразует значения в строку для вывода поля игры в консоль
         Keyword Arguments:
             wide {bool} -- [Делает поле шире в случае True] (default: {False})
         
@@ -185,7 +186,8 @@ class Board(object):
             col_number {integer} -- Номер столбца, начиная с единицы
         
         Returns:
-            tuple of integers or bool -- Кортеж вида (номер квадрата, позиция в квардате) начиная с единицы
+            tuple of integers or bool -- Кортеж вида:
+            (номер квадрата, позиция в квардате) начиная с единицы
             False при неудачном преобразовании
         """
         sq_numb = ((row_number-1)//self.__dim) * self.__dim + (1 + (col_number-1)//self.__dim)
@@ -200,7 +202,7 @@ class Board(object):
         """Записывает линию в поле
         
         Arguments:
-            line_number {integer} -- Номер записываемой строки 
+            line_number {integer} -- Номер записываемой строки
             line {list} -- записываемая строка в виде списка
         
         Returns:
@@ -236,7 +238,7 @@ class Board(object):
             temp_line =  str(Board.v_head[i]) + " " * (1 + int(i<10)) + line.to_str(wide=True) + "\n"
             out += temp_line
             out += sep_line
-            out += "\n"
+            #out += "\n""
         return out
 
     def can_insert(self, symbol, position):
@@ -248,7 +250,8 @@ class Board(object):
         
         Returns:
             tuple(bool, int, String) -- Кортеж вида (bool - возможна ли замена
-            int - код операции: -1 если произошла ошибка, 1 - замена возможна, 0 - замена не возможна
+            int - код операции: -1 если произошла ошибка,
+            1 - замена возможна, 0 - замена не возможна
             String - Описание происходящего на человеческом русском)
         """
         try:
@@ -279,7 +282,8 @@ class Board(object):
         
         Returns:
             tuple(bool, int, String) -- Кортеж вида (bool - выполнена ли замена
-            int - код операции: -1 если произошла ошибка, 1 - замена возможна, 0 - замена не возможна
+            int - код операции: -1 если произошла ошибка,
+            1 - замена возможна, 0 - замена не возможна
             String - Описание происходящего на человеческом русском)
         """
         can_insert = self.can_insert(symbol, position)
