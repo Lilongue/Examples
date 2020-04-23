@@ -1,7 +1,18 @@
-# Examples
-Some code examples
-___
-Подумал, что все равно не угадаю с тем, что лучше зайдет, поэтому не стал писать что-то специально.
-___
-1. Один файл - просто питоновский класс из рабочего проекта
-2. Второй файл просто пример очень коротенькой работы с данными из того, что делал для начальства недавно
+# It's my version of sudoku game
+
+### It'll can two things:
+1. Solve the sudoku game 
+2. Build the sudoku games with different difficulties
+
+- - -  
+
+### What now?
+1. Class of sudoku line is done
+2. Class of sudoku board is done
+3. Unittest file at work
+
+### What to do?
+* test file with UnitTest classes for board
+* Add fast board filling methods
+* Game class
+* Solve class
