@@ -10,12 +10,12 @@ class SudoLine(object):
 
     Конструктор:
     SudoLine(dimention=3, overwrite=True):
-        dimention {int} - колличество квадратов в линии. 
+        dimention {int} - размерность или колличество квадратов в линии.
             Квадрат этого параметра определяет количество символов с троке судоку.
             Допустимые знаения от 2 до 5
         overwrite {bool} - разрешение на перезапись занятой позиции
     ----------------------------------------------------------------------------
-    
+
     Поля:
     full_values_set = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ" - строка с символами
 
@@ -32,21 +32,21 @@ class SudoLine(object):
     ----------------------------------------------------------------------------
 
     Методы:
-    can_insert(self, symbol, position):
+    can_insert(symbol, position):
         Определяет можно ли вставить символ symbol в позицию position
         symbol - должен быть из множества value_set
         position - позиция в линии начиная с 1
 
-    insert(self, symbol, position):
-        Вставляет символ symbol в позицию position. 
+    insert(symbol, position):
+        Вставляет символ symbol в позицию position.
         Удаляет symbol из множества доступных символов.
 
-    delete(self, position):
-        Очищает позицию position. 
+    delete(position):
+        Очищает позицию position.
         При наличии в очищаемой позиции символа возращает его в множество доступных.
     
-    to_str(self, wide = False):
-        Выводит строку судоку в виде строки. Параметр wide делает выводимую строку шире.
+    to_str(wide = False):
+        Выводит линию судоку в виде строки. Параметр wide делает выводимую строку шире.
     """
     full_values_set = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     value_set = None
@@ -98,15 +98,14 @@ class SudoLine(object):
             return 1
         return 2
 
-        
     def insert(self, symbol, position):
         """
         Метод вставляет символ в указанную позицию, если это допустимо
-        
+
         Arguments:
             symbol [string] -- [символ для вставки]
             position [int] -- [позиция для вставки (номерация с единицы)]
-        
+
         Returns:
             [(bool, int, string)] -- Кортеж (
                 bool - Произведена ли вставка
@@ -176,7 +175,52 @@ class SudoLine(object):
         return ("Размерность: "+ str(self.__dim) + "\n" + "Набор символов: " + str(self.value_set) + "\n")
 
 class Board(object):
-    """Класс описывает и отображает игровое поле
+    """
+    Класс описывает и отображает игровое поле
+    ----------------------------------------------------------------------------
+
+    Конструктор:
+    SudoLine(dimention=3, overwrite=True):
+        dimention {int} - размерность или колличество квадратов в линии.
+            Квадрат этого параметра определяет количество символов с троке судоку.
+            Допустимые знаения от 2 до 5
+        overwrite {bool} - разрешение на перезапись занятой позиции
+    ----------------------------------------------------------------------------
+
+    Поля:
+    h_head - строка "abcdefghijklmnopqrstuvwxyz" для подписи столбцов игрового поля
+    v_head  - список цифр от 1 до 25 для подписи строк игрового поля
+    sep_line - строка разделитель "+-" (компактный вариант)
+    sep_line_w - строка разделитель "+---" (более красивый вариант)
+    ----------------------------------------------------------------------------
+
+    Методы:
+    @staticmethod
+    index_from_mark(col_head, row_head):
+        Преобразует значение метки в координаты доски. Можно передавать строки и числа
+        Например: "а","1" -> (0,0); "b", 1 -> (1, 1)
+
+    index_to_sq(row_number, col_number):
+        Переводит индекс поля в номер квадрата и индекс внутри него.
+        Входные данные типа int. Отсчитываются с 0.
+
+    set_line(line_number, line:list):
+        Заполняет линию с номером line_number данными из списка line.
+    
+    print_board():
+        Выводит поле судоку в виде строки.
+    
+    can_insert(symbol, position):
+        Проверяет можно ли вставить символ symbol в  позицию position
+    
+    insert(symbol, position):
+        Вставляет символ symbol в позицию position
+
+    delete(position):
+        Очищает на поле позицию position
+    
+    check_win():
+        Проверяет поле на заполненность
     """
     h_head = list("abcdefghijklmnopqrstuvwxyz")
     v_head = [i+1 for i in range(25)]
@@ -202,15 +246,16 @@ class Board(object):
         
         Returns:
             tuple of integers -- Кортеж в виде (номер строки, номер столбца) номера с нуля
+            При невозможности преобразования возвращает None
         """
-        out = [0,0]
+        out = [-1,-1]
         if isinstance(row_head, int):
             out[0] = row_head
         elif isinstance(row_head, str):
             try:
                 out[0] = int(row_head)
-            except:
-                pass
+            except ValueError:
+                return None
         if isinstance(col_head, str):
             for i,l in enumerate(Board.h_head):
                 if l == col_head:
@@ -383,8 +428,6 @@ class Board(object):
 
 
 if __name__ == "__main__":
-    #import doctest
-    #doctest.testmod()
     s3 = SudoLine(3)
     s2 = SudoLine(2)
     s4 = SudoLine(4)
